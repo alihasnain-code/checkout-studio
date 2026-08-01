@@ -14,21 +14,49 @@ datasource db {
 }
 
 model Session {
-  id            String    @id
-  shop          String
-  state         String
-  isOnline      Boolean   @default(false)
-  scope         String?
-  expires       DateTime?
-  accessToken   String
-  userId        BigInt?
-  firstName     String?
-  lastName      String?
-  email         String?
-  accountOwner  Boolean   @default(false)
-  locale        String?
-  collaborator  Boolean?  @default(false)
-  emailVerified Boolean?  @default(false)
+  id                  String     @id
+  shop                String
+  state               String
+  isOnline            Boolean    @default(false)
+  scope               String?
+  expires             DateTime?
+  accessToken         String
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean    @default(false)
+  locale              String?
+  collaborator        Boolean?   @default(false)
+  emailVerified       Boolean?   @default(false)
   refreshToken        String?
   refreshTokenExpires DateTime?
+  appBlocks           AppBlock[]
+}
+
+enum BlockType {
+  DELIVERY_ESTIMATE
+  WHATSAPP_CONFIRMATION
+  ORDER_TRACKING
+  POST_PURCHASE_UPSELL
+  REFERRAL_DISCOUNT
+  REVIEW_PROMPT
+  SOCIAL_FOLLOW
+}
+
+model AppBlock {
+  id String @id @default(cuid())
+
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  shop      String
+  blockType BlockType
+  enabled   Boolean   @default(false)
+  position  Int       @default(0)
+  config    Json
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([sessionId, blockType])
 }

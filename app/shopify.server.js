@@ -6,6 +6,15 @@ import {
 } from "@shopify/shopify-app-react-router/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
+import { seedAppBlocks } from "./lib/seeders/seedAppBlocks.server";
+
+const seeders = [seedAppBlocks];
+
+export async function runSeeders(session) {
+  for (const seeder of seeders) {
+    await seeder(session);
+  }
+}
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
@@ -18,6 +27,13 @@ const shopify = shopifyApp({
   distribution: AppDistribution.AppStore,
   future: {
     expiringOfflineAccessTokens: true,
+  },
+  hooks: {
+    afterAuth: async ({ session }) => {
+      shopify.registerWebhooks({ session });
+
+      await runSeeders(session);
+    }
   },
   ...(process.env.SHOP_CUSTOM_DOMAIN
     ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
