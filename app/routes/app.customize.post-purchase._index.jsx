@@ -4,10 +4,13 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
 import { BLOCK_REGISTRY } from "../lib/blocks/registry";
-import { Truck, MessageCircle, PackageSearch, Gift, ShoppingBag, Star, Share2 } from "lucide-react";
+import { Truck, MessageCircle, PackageSearch, Gift, ShoppingBag, Star, Share2, RotateCcw, XCircle, ShieldCheck, RefreshCw, Layers, PackageCheck, Repeat, Shield } from "lucide-react";
 
-const ICONS = { Truck, MessageCircle, PackageSearch, Gift, ShoppingBag, Star, Share2 };
-const BLOCK_TYPES = Object.keys(BLOCK_REGISTRY);
+const ICONS = { Truck, MessageCircle, PackageSearch, Gift, ShoppingBag, Star, Share2, RotateCcw, XCircle, ShieldCheck, RefreshCw, Layers, PackageCheck, Repeat, Shield };
+
+const BLOCK_TYPES = Object.keys(BLOCK_REGISTRY).filter((type) =>
+    BLOCK_REGISTRY[type].pages.includes("post-purchase")
+);
 
 export const loader = async ({ request }) => {
     const { session } = await authenticate.admin(request);
@@ -106,10 +109,10 @@ export default function CustomizeThankYou() {
     const activeCount = items.filter((b) => b.enabled).length;
 
     return (
-        <s-page inlineSize="large" heading="Thank You Page">
+        <s-page inlineSize="large" heading="Post Purchase">
             <s-section>
                 <s-stack direction="inline" justifyContent="space-between" alignItems="center" gap="small">
-                    <s-heading>Modular Thank You Blocks</s-heading>
+                    <s-heading>Modular Storefront Blocks</s-heading>
                     <s-badge tone="success">{activeCount} Active</s-badge>
                 </s-stack>
                 <s-paragraph color="subdued">Toggle features on or off, configure settings, and reorder block layout display order.</s-paragraph>
@@ -148,7 +151,7 @@ export default function CustomizeThankYou() {
                                                 <s-text tone={item.enabled ? "success" : "subdued"}>
                                                     {item.enabled ? "Active on page" : "Disabled"}
                                                 </s-text>
-                                                <s-button variant="secondary" icon="adjust" href={`/app/customize/thank-you-page/${meta.slug}/block`}>
+                                                <s-button variant="secondary" icon="adjust" href={`/app/customize/post-purchase/${meta.slug}/edit`}>
                                                     Configure
                                                 </s-button>
                                             </s-stack>
